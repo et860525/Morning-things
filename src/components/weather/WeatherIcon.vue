@@ -1,6 +1,6 @@
 <template lang="">
   <div>
-    <img :src="weatherIcons.day[weatherCode2Type(currentWeatherCode)]" alt="" />
+    <img :src="weatherIcons[dayStatus][weatherCode2Type(currentWeatherCode)]" alt="" />
   </div>
 </template>
 
@@ -30,8 +30,13 @@ defineProps({
     type: Number,
     default: 1,
   },
+  dayStatus: {
+    type: String,
+    default: 'night',
+  },
 });
 
+// https://opendata.cwb.gov.tw/opendatadoc/MFC/ForecastElement.pdf
 const weatherTypes = {
   isThunderstorm: [15, 16, 17, 18, 21, 22, 33, 34, 35, 36, 41],
   isClear: [1],

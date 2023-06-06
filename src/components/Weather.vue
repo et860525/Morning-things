@@ -3,7 +3,7 @@
     <Title :location="currentWeather.locationName" :description="currentWeather.description" />
     <div class="flex justify-center gap-10 items-center">
       <CurrentWeather :temperature="currentWeather.temperature" />
-      <WeatherIcon :currentWeatherCode="currentWeather.weatherCode" />
+      <WeatherIcon :currentWeatherCode="currentWeather.weatherCode" :dayStatus="currentWeather.dayStatus" />
     </div>
     <div class="flex justify-start items-center gap-5 mt-5 px-5">
       <Airflow :wind="currentWeather.windSpeed" />
@@ -18,6 +18,7 @@
           () => {
             fetchCurrentWeather();
             fetchWeatherForecast();
+            fetchSunRiseSunSet();
             updateAPILimit();
           }
         "
@@ -62,6 +63,7 @@ interface IWeather {
   weatherCode: number;
   rainPossibility: number;
   comfortability: string;
+  dayStatus: string;
 }
 
 // 預設資料
@@ -75,6 +77,7 @@ const currentWeather: IWeather = reactive({
   weatherCode: 1,
   rainPossibility: 10,
   comfortability: '悶熱',
+  dayStatus: 'night',
 });
 
 // 優化 date
@@ -85,7 +88,7 @@ const dateFormat = () => {
   }).format(new Date(currentWeather.observationTime));
 };
 
-// 優化 rain
+// 優化降雨率
 const percentageFormat = computed(() => {
   return currentWeather.rainPossibility;
 });
@@ -145,9 +148,40 @@ const fetchWeatherForecast = async () => {
   }
 };
 
+// 獲得日出日落時間 API
+const fetchSunRiseSunSet = async () => {
+  // 獲得目前日期
+  let currentDate: string = new Date().toJSON().slice(0, 10);
+
+  // 設定獲取日期的範圍：當前日期的後兩天
+  let end: Date = new Date();
+  end.setDate(end.getDate() + 2);
+  let endDate = end.toJSON().slice(0, 10);
+
+  // 從目前時間開始獲得日出日落的資料
+  const url = `https://opendata.cwb.gov.tw/api/v1/rest/datastore/A-B0062-001?Authorization=${API_KEY}&format=JSON&CountyName=高雄市&timeFrom=${currentDate}&timeTo=${endDate}`;
+
+  const sunAPIData = await axios.get(url);
+  const sunRiseSunSetData = sunAPIData.data.records.locations.location[0];
+
+  // 找尋資料內與現在日期一致的
+  const locationDate = sunRiseSunSetData.time.find((time: any) => time.Date === currentDate);
+
+  // 將日出、日落、現在時間，轉為 TimeStamp
+  const sunriseTimestamp = new Date(`${locationDate.Date} ${locationDate.SunRiseTime}`).getTime();
+
+  const sunsetTimestamp = new Date(`${locationDate.Date} ${locationDate.SunSetTime}`).getTime();
+
+  const nowTimeStamp = new Date().getTime();
+
+  // 如果目前的時間在日出與日落中間，那就是白天，其他時間為晚上
+  currentWeather.dayStatus = sunriseTimestamp <= nowTimeStamp && nowTimeStamp <= sunsetTimestamp ? 'day' : 'night';
+};
+
 // 初始化
 onMounted(() => {
   fetchCurrentWeather();
   fetchWeatherForecast();
+  fetchSunRiseSunSet();
 });
 </script>
