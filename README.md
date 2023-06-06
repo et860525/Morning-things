@@ -8,13 +8,13 @@ This project that covers all the significant events of today from early morning.
 
 ## Task Lists
 
-- [] NavBar
+- [ ] NavBar
   - [x] Brand
-	- [] Router
+	- [ ] Router
 - [x] Weather Card
   - [x] Real API from [氣象資料開放平台](https://opendata.cwb.gov.tw/index)
-- [] News
-- [] Auth
+- [ ] News
+- [ ] Auth
 
 ## Project Setup
 
