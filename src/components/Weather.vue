@@ -7,7 +7,7 @@
     </div>
     <div class="flex justify-start items-center gap-5 mt-5 px-5">
       <Airflow :wind="currentWeather.windSpeed" />
-      <Rain :rain="percentageFormat" />
+      <Rain :rain="currentWeather.rainPossibility" />
     </div>
 
     <!-- TODO: 如果要做成一個 Component 要如何限制按鈕間 -->
@@ -24,14 +24,16 @@
         "
         :disabled="disabled.clicked"
       >
-        <i class="fa-solid fa-rotate-right text-lg"></i>
+        <!-- Windows 動畫設定不能關掉，否則看不到旋轉特效 -->
+        <i class="fa-solid fa-refresh fa-spin" style="color: #7da8f2" v-if="isLoading.status === true"></i>
+        <i class="fa-solid fa-rotate" v-else></i>
       </button>
     </div>
   </WeatherCard>
 </template>
 
 <script setup lang="ts">
-import { reactive, computed, onMounted } from 'vue';
+import { reactive, onMounted } from 'vue';
 import WeatherCard from './weather/WeatherCard.vue';
 import Title from './weather/Title.vue';
 import WeatherIcon from './weather/WeatherIcon.vue';
@@ -42,7 +44,9 @@ import Redo from './weather/Redo.vue';
 import axios from 'axios';
 
 const API_KEY = import.meta.env.VITE_API_KEY;
-let disabled = reactive({ clicked: false });
+
+const disabled = reactive({ clicked: false });
+const isLoading = reactive({ status: false });
 
 // 中央氣象局的更新頻率為 1 小時
 const updateAPILimit = () => {
@@ -88,13 +92,11 @@ const dateFormat = () => {
   }).format(new Date(currentWeather.observationTime));
 };
 
-// 優化降雨率
-const percentageFormat = computed(() => {
-  return currentWeather.rainPossibility;
-});
-
 // 獲得目前天氣 API
 const fetchCurrentWeather = async () => {
+  // 更新按鈕動畫
+  isLoading.status = true;
+
   const url = `https://opendata.cwb.gov.tw/api/v1/rest/datastore/O-A0003-001?Authorization=${API_KEY}&limit=5&format=JSON&locationName=高雄`;
 
   try {
@@ -173,6 +175,8 @@ const fetchSunRiseSunSet = async () => {
   const sunsetTimestamp = new Date(`${locationDate.Date} ${locationDate.SunSetTime}`).getTime();
 
   const nowTimeStamp = new Date().getTime();
+
+  isLoading.status = false;
 
   // 如果目前的時間在日出與日落中間，那就是白天，其他時間為晚上
   currentWeather.dayStatus = sunriseTimestamp <= nowTimeStamp && nowTimeStamp <= sunsetTimestamp ? 'day' : 'night';
