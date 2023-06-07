@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "vite",
+    "dev:frontend": "vite --host",
+    "dev:server": "nodemon server/index.ts",
+    "dev": "concurrently 'pnpm:dev:frontend' 'pnpm:dev:server'",
     "build": "run-p type-check build-only",
     "preview": "vite preview",
     "build-only": "vite build",
@@ -12,18 +14,24 @@
   "dependencies": {
     "axios": "^1.4.0",
     "dotenv": "^16.1.4",
+    "express": "^4.18.2",
+    "rss-parser": "^3.13.0",
     "vue": "^3.3.2",
     "vue-router": "^4.2.0"
   },
   "devDependencies": {
     "@tsconfig/node18": "^2.0.1",
+    "@types/express": "^4.17.17",
     "@types/node": "^18.16.8",
     "@vitejs/plugin-vue": "^4.2.3",
     "@vue/tsconfig": "^0.4.0",
     "autoprefixer": "^10.4.14",
+    "concurrently": "^8.1.0",
+    "nodemon": "^2.0.22",
     "npm-run-all": "^4.1.5",
     "postcss": "^8.4.24",
     "tailwindcss": "^3.3.2",
+    "ts-node": "^10.9.1",
     "typescript": "~5.0.4",
     "vite": "^4.3.5",
     "vue-tsc": "^1.6.4"
