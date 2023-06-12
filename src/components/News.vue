@@ -15,18 +15,12 @@ const news_list: any = reactive({ items: [] });
 // 從後端 Server 獲得 RSS API
 const fetchRSS = async () => {
   try {
-    // TODO: 後面會選擇 RSS
-    const rss = await axios.get('/api/rss/v1');
+    // Get RSS from server
+    const rss = await axios.get('/api/v1/rss');
 
-    // TODO: 組合所有 RSS 的前三篇文章
-
-    // 目前一次只有一個 RSS
-    rss.data.feed.items.forEach((news: any) => {
-      // 把原始的 Title 與 link 加到單個新聞裡
-      news.origin_title = rss.data.feed.title;
-      news.origin_link = rss.data.feed.link;
-      news_list.items.push(news);
-    });
+    // Copy all feeds into 'news_list'
+    news_list.items = [];
+    news_list.items = Array.from(rss.data.feeds);
   } catch (err) {
     console.log(err);
   }
