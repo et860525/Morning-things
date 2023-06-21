@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-lg text-white shadow-2xl" :class="{ 'row-span-1': isImage, 'row-span-2': !isImage }">
+  <div class="rounded-lg text-white shadow-2xl border" :class="{ 'row-span-1': isImage, 'row-span-2': !isImage }">
     <a :href="props.item.link">
       <h2 class="text-2xl lg:text-3xl text-center p-4" :class="classObject.a_tag_hover">{{ props.item.title }}</h2>
     </a>
