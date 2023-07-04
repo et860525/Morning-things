@@ -1,6 +1,10 @@
 # ☕ Morning Things
 
+## Weather component
 ![layered-architecture.png](https://github.com/et860525/Morning-things/blob/main/cover.png)
+
+## News component
+![layered-architecture.png](https://github.com/et860525/Morning-things/blob/main/api-news.png)
 
 打開網站就能看到今天一早所有的大小事的專案。
 
